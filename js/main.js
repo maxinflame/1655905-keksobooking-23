@@ -1,18 +1,10 @@
-const getRandomIntegerNumber = (min, max) => {
-  if (max > min) {
-    return Math.round(Math.random() * (max - min) + min);
-  }
-
-  return Math.round(Math.random() * (min - max) + max);
+const getRandomFloatNumber = (from, to, accuracy) => {
+  const min = Math.min(from, to);
+  const max = Math.max(from, to);
+  return Number((Math.random() * (max - min) + min).toFixed(accuracy));
 };
 
-const getRandomFloatNumber = (min, max, accuracy) => {
-  if (max > min) {
-    return (Math.random() * (max - min) + min).toFixed(accuracy);
-  }
+const getRandomIntegerNumber = (from, to) => getRandomFloatNumber(from, to, 0);
 
-  return (Math.random() * (min - max) + max).toFixed(accuracy);
-};
-
-getRandomIntegerNumber(20, 25);
+getRandomIntegerNumber(19, 21);
 getRandomFloatNumber(100, 120, 5);
