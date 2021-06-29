@@ -1,8 +1,7 @@
 import {createAds} from './data.js';
-import {createCards} from './cards.js';
+import {createCard} from './cards.js';
 
-const cardsListFragment = document.createDocumentFragment();
 const ads = createAds();
-const cards = createCards(ads, cardsListFragment);
+const card = createCard(ads[0]);
 const cardsList = document.querySelector('#map-canvas');
-cardsList.appendChild(cards.firstElementChild);
+cardsList.appendChild(card);
