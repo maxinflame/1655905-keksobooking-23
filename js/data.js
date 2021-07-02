@@ -12,7 +12,7 @@ const createOffer = (lat, lng) => {
     rooms: getRandomIntegerNumber(MIN_ROOMS, MAX_ROOMS),
     guests: getRandomIntegerNumber(MIN_GUESTS, MAX_GUESTS),
     checkin: getRandomArrayElement(TIMES),
-    checkout: getRandomArrayElement(TIMES),
+
     features: getFewRandomArrayElements(FEATURES),
     description: getRandomArrayElement(DESCRIPTIONS),
     photos: getFewRandomArrayElements(PHOTOS),
