@@ -2,33 +2,42 @@ const roomsSelect = document.querySelector('#room_number');
 const guestsSelect = document.querySelector('#capacity');
 const guestsOptions = guestsSelect.querySelectorAll('option');
 
-const disableGuestsOptions = (roomsQuantity) => {
+const ROOMS = {
+  ONE: 1,
+  TWO: 2,
+  THREE: 3,
+  HUNDRED: 100,
+};
+
+const GUESTS = {
+  ZERO: 0,
+  ONE: 1,
+  TWO: 2,
+  THREE: 3,
+};
+
+const AVAILABLE_GUESTS = {
+  [ROOMS.ONE]: [GUESTS.ONE],
+  [ROOMS.TWO]: [GUESTS.ONE,  GUESTS.TWO],
+  [ROOMS.THREE]: [GUESTS.ONE,  GUESTS.TWO, GUESTS.THREE],
+  [ROOMS.HUNDRED]: [GUESTS.ZERO],
+};
+
+const disableGuestsOptions = (validGuests) => {
   guestsOptions.forEach((item) => {
     item.disabled = true;
   });
 
-  for(let i = 0; i <= roomsQuantity; i++) {
-    guestsSelect.querySelector(`option[value="${i}"]`).disabled = false;
-  }
+  validGuests.forEach((item) => {
+    guestsSelect.querySelector(`option[value="${item}"]`).disabled = false;
+  });
 };
 
 const validateGuests = () => {
-  if (roomsSelect.value === '100') {
-    disableGuestsOptions(0);
-    guestsSelect.value = 0;
-  }
-  else {
-    disableGuestsOptions(roomsSelect.value);
-  }
-
-  if (guestsSelect.value > roomsSelect.value || (guestsSelect.value === '0' && roomsSelect.value !== '100')) {
-    if (guestsSelect.value === '0') {
-      guestsSelect.value = 3;
-    }
-    while (guestsSelect.value > roomsSelect.value) {
-      guestsSelect.value -= 1;
-    }
-  }
+  const validGuests = AVAILABLE_GUESTS[roomsSelect.value];
+  const [defaultGuestValue] = validGuests;
+  disableGuestsOptions(validGuests);
+  guestsSelect.value = defaultGuestValue;
 };
 
 roomsSelect.addEventListener('change', validateGuests);
