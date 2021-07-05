@@ -25,11 +25,7 @@ const AVAILABLE_GUESTS = {
 
 const disableGuestsOptions = (validGuests) => {
   guestsOptions.forEach((item) => {
-    item.disabled = true;
-  });
-
-  validGuests.forEach((item) => {
-    guestsSelect.querySelector(`option[value="${item}"]`).disabled = false;
+    item.disabled = !validGuests.includes(Number(item.value));
   });
 };
 
