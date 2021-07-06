@@ -1,3 +1,37 @@
+const adForm = document.querySelector('.ad-form');
+const adFormFieldsets = adForm.querySelectorAll('fieldset');
+const mapFiltersForm = document.querySelector('.map__filters');
+const mapSelects = mapFiltersForm.querySelectorAll('select');
+const mapFieldset = mapFiltersForm.querySelector('fieldset');
+
+const disableArrayElements =  (array) => {
+  array.forEach((item) => {
+    item.disabled = true;
+  });
+};
+
+const ableArrayElements =  (array) => {
+  array.forEach((item) => {
+    item.disabled = false;
+  });
+};
+
+const deactivatePage = () => {
+  adForm.classList.add('ad-form--disabled');
+  disableArrayElements(adFormFieldsets);
+  mapFiltersForm.classList.add('map__filters--disabled');
+  disableArrayElements(mapSelects);
+  mapFieldset.disabled = true;
+};
+
+const activatePage = () => {
+  adForm.classList.remove('ad-form--disabled');
+  ableArrayElements(adFormFieldsets);
+  mapFiltersForm.classList.remove('map__filters--disabled');
+  ableArrayElements(mapSelects);
+  mapFieldset.disabled = false;
+};
+
 const roomsSelect = document.querySelector('#room_number');
 const guestsSelect = document.querySelector('#capacity');
 const guestsOptions = guestsSelect.querySelectorAll('option');
@@ -36,4 +70,5 @@ const validateGuests = () => {
   guestsSelect.value = defaultGuestValue;
 };
 
+validateGuests();
 roomsSelect.addEventListener('change', validateGuests);
