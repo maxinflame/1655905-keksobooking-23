@@ -64,5 +64,8 @@ const validateGuests = () => {
   guestsSelect.value = defaultGuestValue;
 };
 
+deactivatePage();
 validateGuests();
 roomsSelect.addEventListener('change', validateGuests);
+
+export {activatePage, deactivatePage};

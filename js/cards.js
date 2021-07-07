@@ -67,7 +67,7 @@ const getCheckInText = (checkin, checkout) => {
   }
 };
 
-const createCard = function (item) {
+const createPopup = function (item) {
   const cardElement = cardTemplate.cloneNode(true);
   const {
     author: {
@@ -113,4 +113,4 @@ const createCard = function (item) {
   return cardElement;
 };
 
-export {createCard};
+export {createPopup};
