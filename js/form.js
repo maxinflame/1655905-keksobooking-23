@@ -1,31 +1,7 @@
+import {sendData} from './api.js';
+import {resetMainPin, putCoordinatesInAddress} from './map.js';
+
 const adForm = document.querySelector('.ad-form');
-const adFormFieldsets = adForm.querySelectorAll('fieldset');
-const mapFiltersForm = document.querySelector('.map__filters');
-const mapSelects = mapFiltersForm.querySelectorAll('select');
-const mapFieldset = mapFiltersForm.querySelector('fieldset');
-
-const changeDisabledElements =  (array, disabled) => {
-  array.forEach((item) => {
-    item.disabled = disabled;
-  });
-};
-
-const deactivatePage = () => {
-  adForm.classList.add('ad-form--disabled');
-  changeDisabledElements(adFormFieldsets, true);
-  mapFiltersForm.classList.add('map__filters--disabled');
-  changeDisabledElements(mapSelects, true);
-  mapFieldset.disabled = true;
-};
-
-const activatePage = () => {
-  adForm.classList.remove('ad-form--disabled');
-  changeDisabledElements(adFormFieldsets, false);
-  mapFiltersForm.classList.remove('map__filters--disabled');
-  changeDisabledElements(mapSelects, false);
-  mapFieldset.disabled = false;
-};
-
 const roomsSelect = document.querySelector('#room_number');
 const guestsSelect = document.querySelector('#capacity');
 const guestsOptions = guestsSelect.querySelectorAll('option');
@@ -64,8 +40,27 @@ const validateGuests = () => {
   guestsSelect.value = defaultGuestValue;
 };
 
-deactivatePage();
+
 validateGuests();
 roomsSelect.addEventListener('change', validateGuests);
 
-export {activatePage, deactivatePage};
+const resetForm = () => {
+  adForm.reset();
+  resetMainPin();
+  putCoordinatesInAddress();
+  validateGuests();
+};
+
+adForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+
+  const formData = new FormData(evt.target);
+  sendData(formData, resetForm);
+});
+
+
+const resetButton = document.querySelector('.ad-form__reset');
+resetButton.addEventListener('click', (evt) => {
+  evt.preventDefault();
+  resetForm();
+});

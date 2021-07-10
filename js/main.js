@@ -1,8 +1,12 @@
-import {createAds} from './data.js';
-import {createMarker} from './map.js';
+import {createAdMarker} from './map.js';
 import './form.js';
 import './map.js';
+import {getData} from './api.js';
 
-const ads = createAds();
-ads.forEach((item) => createMarker(item));
+const createMarkers = (ads) => {
+  ads.forEach((item) => {
+    createAdMarker(item);
+  });
+};
 
+getData(createMarkers);
