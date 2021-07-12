@@ -2,6 +2,7 @@ import {createAdMarker} from './map.js';
 import './form.js';
 import './map.js';
 import {getData} from './api.js';
+import {showAlert} from './util.js';
 
 const createMarkers = (ads) => {
   ads.forEach((item) => {
@@ -9,4 +10,8 @@ const createMarkers = (ads) => {
   });
 };
 
-getData(createMarkers);
+const onErrorLoad = () => {
+  showAlert('Не удалось загрузить данные с сервера');
+};
+
+getData(createMarkers, onErrorLoad);

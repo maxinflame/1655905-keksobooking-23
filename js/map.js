@@ -1,13 +1,16 @@
 import {activatePage, deactivatePage} from './util.js';
 import {createPopup} from './cards.js';
 import {CenterCoordinates} from './constants.js';
+import {updateAddress} from './form.js';
 
 const  MAIN_PIN_ICON_SIZE = [52, 52];
 const PIN_ICON_SIZE = [40, 40];
+const PinIconUrl= {
+  mainIcon: '../img/main-pin.svg',
+  regularPin: '../img/pin.svg',
+};
 
 deactivatePage();
-
-const inputAddress = document.querySelector('#address');
 
 const map = L.map('map-canvas')
   .on('load', () => {
@@ -49,18 +52,16 @@ const createPinIcon = (iconUrl, iconSize) => {
   return icon;
 };
 
-const mainPinMarker = createMarker(CenterCoordinates.lat, CenterCoordinates.lng, createPinIcon('../img/main-pin.svg', MAIN_PIN_ICON_SIZE), true);
+const mainPinMarker = createMarker(CenterCoordinates.lat, CenterCoordinates.lng, createPinIcon(PinIconUrl.mainIcon, MAIN_PIN_ICON_SIZE), true);
 
-const putCoordinatesInAddress = () => {
-  const coordinates = mainPinMarker.getLatLng();
-  inputAddress.value = `${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}`;
-};
-
-putCoordinatesInAddress();
-mainPinMarker.on('moveend', putCoordinatesInAddress);
+updateAddress(CenterCoordinates);
+mainPinMarker.on('moveend', (evt) => {
+  const mainPinCoordinates = evt.target.getLatLng();
+  updateAddress(mainPinCoordinates);
+});
 
 const createAdMarker = (ad) => {
-  const marker = createMarker(ad.location.lat, ad.location.lng, createPinIcon('../img/pin.svg', PIN_ICON_SIZE), false);
+  const marker = createMarker(ad.location.lat, ad.location.lng, createPinIcon(PinIconUrl.regularPin, PIN_ICON_SIZE), false);
   marker.bindPopup(createPopup(ad));
 };
 
@@ -69,4 +70,4 @@ const resetMainPin = ()=> {
   mainPinMarker.setLatLng(newLatLng);
 };
 
-export {createAdMarker, putCoordinatesInAddress, resetMainPin};
+export {createAdMarker, resetMainPin};

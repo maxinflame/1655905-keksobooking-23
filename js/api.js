@@ -1,39 +1,47 @@
-import {showAlert, showMessage} from './util.js';
+const DataUrl = {
+  LOAD: 'https://23.javascript.pages.academy/keksobooking/data',
+  SEND: 'https://23.javascript.pages.academy/keksobooking',
+};
 
-const getData = (onSuccess) => {
-  fetch('https://23.javascript.pages.academy/keksobooking/data')
+const Method = {
+  GET: 'Get',
+  POST: 'Post',
+};
+
+const sendFetch = (url, request) => {
+  const fetchResult = fetch(url, request)
     .then((response) => {
       if (response.ok) {
-        return response.json();}
-      else {
-        showAlert('Не удалось загрузить данные с сервера');
+        return response.json();
       }
-    })
-    .then((ads) =>{
-      onSuccess(ads);
-    })
+      else {
+        throw new Error(`Не удалось загрузить данные с сервера. ${url} ${request.method}`);
+      }
+    });
+  return fetchResult;
+};
+
+const getData = (onSuccess, onError) => {
+  sendFetch(DataUrl.LOAD, {
+    method: Method.Get,
+  })
+    .then((data) => onSuccess(data))
     .catch(() => {
-      showAlert('Не удалось загрузить данные с сервера');
+      onError();
     });
 };
 
-const sendData = (body, reset) => {
-  fetch(
-    'https://23.javascript.pages.academy/keksobooking',
-    {
-      method: 'POST',
-      body: body,
-    },
-  ).then((response) => {
-    if (response.ok) {
-      reset();
-      showMessage('success');
-    } else {
-      showMessage('error');
-    }
-  }).catch(() => {
-    showMessage('error');
-  });
+const sendData = (body, onSuccess, onError) => {
+  sendFetch(DataUrl.SEND, {
+    method: Method.POST,
+    body,
+  })
+    .then((data) => {
+      onSuccess(data);
+    })
+    .catch(() => {
+      onError();
+    });
 };
 
 export {getData, sendData};

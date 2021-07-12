@@ -1,10 +1,13 @@
 import {sendData} from './api.js';
-import {resetMainPin, putCoordinatesInAddress} from './map.js';
+import { CenterCoordinates } from './constants.js';
+import {resetMainPin} from './map.js';
+import {showMessage} from './util.js';
 
 const adForm = document.querySelector('.ad-form');
 const roomsSelect = document.querySelector('#room_number');
 const guestsSelect = document.querySelector('#capacity');
 const guestsOptions = guestsSelect.querySelectorAll('option');
+const inputAddress = document.querySelector('#address');
 
 const ROOMS = {
   ONE: 1,
@@ -44,18 +47,31 @@ const validateGuests = () => {
 validateGuests();
 roomsSelect.addEventListener('change', validateGuests);
 
+const updateAddress = (coordinates) => {
+  inputAddress.value = `${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}`;
+};
+
 const resetForm = () => {
   adForm.reset();
   resetMainPin();
-  putCoordinatesInAddress();
+  updateAddress(CenterCoordinates);
   validateGuests();
+};
+
+const onSuccessSendForm = () => {
+  resetForm();
+  showMessage('success');
+};
+
+const onErrorSendForm = () => {
+  showMessage('');
 };
 
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
   const formData = new FormData(evt.target);
-  sendData(formData, resetForm);
+  sendData(formData, onSuccessSendForm, onErrorSendForm);
 });
 
 
@@ -64,3 +80,5 @@ resetButton.addEventListener('click', (evt) => {
   evt.preventDefault();
   resetForm();
 });
+
+export {updateAddress};
