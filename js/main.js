@@ -1,8 +1,17 @@
-import {createAds} from './data.js';
-import {createMarker} from './map.js';
+import {createAdMarker} from './map.js';
 import './form.js';
 import './map.js';
+import {getData} from './api.js';
+import {showAlert} from './util.js';
 
-const ads = createAds();
-ads.forEach((item) => createMarker(item));
+const createMarkers = (ads) => {
+  ads.forEach((item) => {
+    createAdMarker(item);
+  });
+};
 
+const onErrorLoad = () => {
+  showAlert('Не удалось загрузить данные с сервера');
+};
+
+getData(createMarkers, onErrorLoad);

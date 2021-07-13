@@ -1,21 +1,24 @@
-import {activatePage} from './form.js';
+import {activatePage, deactivatePage} from './util.js';
 import {createPopup} from './cards.js';
+import {CenterCoordinates} from './constants.js';
+import {updateAddress} from './form.js';
 
-const centerCoordinates = {
-  lat: 	35.6895,
-  lng: 139.692,
+const  MAIN_PIN_ICON_SIZE = [52, 52];
+const PIN_ICON_SIZE = [40, 40];
+const PinIconUrl= {
+  mainIcon: '../img/main-pin.svg',
+  regularPin: '../img/pin.svg',
 };
 
-const inputAddress = document.querySelector('#address');
-inputAddress.readOnly = true;
+deactivatePage();
 
 const map = L.map('map-canvas')
   .on('load', () => {
     activatePage();
   })
   .setView ({
-    lat: 	centerCoordinates.lat,
-    lng: centerCoordinates.lng,
+    lat: 	CenterCoordinates.lat,
+    lng: CenterCoordinates.lng,
   }, 12);
 
 L.tileLayer(
@@ -25,51 +28,46 @@ L.tileLayer(
   },
 ).addTo(map);
 
-const mainPinIcon = L.icon({
-  iconUrl: '../img/main-pin.svg',
-  iconSize: [52, 52],
-  iconAnchor: [26, 52],
-});
-
-const mainPinMarker = L.marker(
-  {
-    lat: centerCoordinates.lat,
-    lng: centerCoordinates.lng,
-  },
-  {
-    draggable: true,
-    icon: mainPinIcon,
-  },
-);
-
-mainPinMarker.addTo(map);
-
-const putCoordinatesInAddress = () => {
-  const coordinates = mainPinMarker.getLatLng();
-  inputAddress.value = `${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}`;
+const createMarker = (lat, lng, icon, isDraggable) => {
+  const marker = L.marker(
+    {
+      lat: lat,
+      lng: lng,
+    },
+    {
+      icon: icon,
+      draggable: isDraggable,
+    },
+  );
+  marker.addTo(map);
+  return marker;
 };
 
-putCoordinatesInAddress();
-mainPinMarker.on('moveend', putCoordinatesInAddress);
-
-const pinIcon = L.icon({
-  iconUrl: '../img/pin.svg',
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-});
-
-const createMarker = (ad) => {
-  const marker = L.marker({
-    lat: ad.location.lat,
-    lng: ad.location.lng,
-  },
-  {
-    icon: pinIcon,
+const createPinIcon = (iconUrl, iconSize) => {
+  const icon = L.icon({
+    iconUrl: iconUrl,
+    iconSize: iconSize,
+    iconAnchor: [iconSize[0] / 2, iconSize[1]],
   });
-
-  marker
-    .addTo(map)
-    .bindPopup(createPopup(ad));
+  return icon;
 };
 
-export {createMarker};
+const mainPinMarker = createMarker(CenterCoordinates.lat, CenterCoordinates.lng, createPinIcon(PinIconUrl.mainIcon, MAIN_PIN_ICON_SIZE), true);
+
+updateAddress(CenterCoordinates);
+mainPinMarker.on('moveend', (evt) => {
+  const mainPinCoordinates = evt.target.getLatLng();
+  updateAddress(mainPinCoordinates);
+});
+
+const createAdMarker = (ad) => {
+  const marker = createMarker(ad.location.lat, ad.location.lng, createPinIcon(PinIconUrl.regularPin, PIN_ICON_SIZE), false);
+  marker.bindPopup(createPopup(ad));
+};
+
+const resetMainPin = ()=> {
+  const newLatLng = new L.LatLng(CenterCoordinates.lat, CenterCoordinates.lng);
+  mainPinMarker.setLatLng(newLatLng);
+};
+
+export {createAdMarker, resetMainPin};
