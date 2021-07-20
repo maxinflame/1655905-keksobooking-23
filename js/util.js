@@ -1,3 +1,5 @@
+const ESCAPE_CODES = ['Escape', 'Esc'];
+
 const showAlert = (message) => {
   const alertContainer = document.createElement('div');
   alertContainer.style.zIndex = 100;
@@ -15,22 +17,33 @@ const showAlert = (message) => {
   document.body.append(alertContainer);
 };
 
+const removeMessage = () => {
+  const message = document.querySelector('.form-message');
+  message.remove();
+};
+
+const onPopupEscKeydown = (evt) => {
+  if (evt.key === ESCAPE_CODES[0] || evt.key === ESCAPE_CODES[1]) {
+    evt.preventDefault();
+    removeMessage();
+    document.removeEventListener('keydown', onPopupEscKeydown);
+  }
+};
+
+const removeMessageByClick = () => {
+  removeMessage();
+  document.removeEventListener('keydown', onPopupEscKeydown);
+};
 
 const showMessage = (templateName) => {
   const messageTemplate = document.querySelector(`#${templateName}`)
     .content
     .querySelector(`.${templateName}`);
   const message = messageTemplate.cloneNode(true);
+  message.classList.add('form-message');
   document.body.append(message);
-  document.addEventListener('click', () => {
-    message.remove();
-  });
-  document.addEventListener('keydown', (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
-      evt.preventDefault();
-      message.remove();
-    }
-  });
+  message.addEventListener('click', removeMessageByClick);
+  document.addEventListener('keydown', onPopupEscKeydown);
 };
 
 const adForm = document.querySelector('.ad-form');

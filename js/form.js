@@ -1,5 +1,4 @@
 import {sendData} from './api.js';
-import { CenterCoordinates } from './constants.js';
 import {resetMainPin} from './map.js';
 import {showMessage} from './util.js';
 
@@ -54,7 +53,6 @@ const updateAddress = (coordinates) => {
 const resetForm = () => {
   adForm.reset();
   resetMainPin();
-  updateAddress(CenterCoordinates);
   validateGuests();
 };
 
@@ -64,7 +62,7 @@ const onSuccessSendForm = () => {
 };
 
 const onErrorSendForm = () => {
-  showMessage('');
+  showMessage('error');
 };
 
 adForm.addEventListener('submit', (evt) => {

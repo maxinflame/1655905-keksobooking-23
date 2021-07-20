@@ -17,8 +17,8 @@ const map = L.map('map-canvas')
     activatePage();
   })
   .setView ({
-    lat: 	CenterCoordinates.lat,
-    lng: CenterCoordinates.lng,
+    lat: 	CenterCoordinates.LAT,
+    lng: CenterCoordinates.LNG,
   }, 12);
 
 L.tileLayer(
@@ -52,22 +52,34 @@ const createPinIcon = (iconUrl, iconSize) => {
   return icon;
 };
 
-const mainPinMarker = createMarker(CenterCoordinates.lat, CenterCoordinates.lng, createPinIcon(PinIconUrl.mainIcon, MAIN_PIN_ICON_SIZE), true);
+const mainPinMarker = createMarker(CenterCoordinates.LAT, CenterCoordinates.LNG, createPinIcon(PinIconUrl.mainIcon, MAIN_PIN_ICON_SIZE), true);
 
-updateAddress(CenterCoordinates);
+const DefaultMainPinCoordinates = mainPinMarker.getLatLng();
+updateAddress(DefaultMainPinCoordinates);
+
 mainPinMarker.on('moveend', (evt) => {
   const mainPinCoordinates = evt.target.getLatLng();
   updateAddress(mainPinCoordinates);
 });
 
+const adMarkers = [];
+
 const createAdMarker = (ad) => {
   const marker = createMarker(ad.location.lat, ad.location.lng, createPinIcon(PinIconUrl.regularPin, PIN_ICON_SIZE), false);
   marker.bindPopup(createPopup(ad));
+  adMarkers.push(marker);
+};
+
+const deleteAdMarkers = () => {
+  adMarkers.forEach((item) => {
+    item.remove();
+  });
 };
 
 const resetMainPin = ()=> {
-  const newLatLng = new L.LatLng(CenterCoordinates.lat, CenterCoordinates.lng);
-  mainPinMarker.setLatLng(newLatLng);
+  mainPinMarker.setLatLng(DefaultMainPinCoordinates);
+  updateAddress(DefaultMainPinCoordinates);
 };
 
-export {createAdMarker, resetMainPin};
+
+export {createAdMarker, resetMainPin, deleteAdMarkers};

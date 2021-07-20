@@ -3,11 +3,16 @@ import './form.js';
 import './map.js';
 import {getData} from './api.js';
 import {showAlert} from './util.js';
+import {rerenderMarkers} from './filter.js';
+import {MAX_AD_MARKERS} from './constants.js';
 
-const createMarkers = (ads) => {
-  ads.forEach((item) => {
-    createAdMarker(item);
-  });
+let ads;
+
+const createMarkers = (data) => {
+  ads = data;
+  ads
+    .slice(0, MAX_AD_MARKERS)
+    .forEach(createAdMarker);
 };
 
 const onErrorLoad = () => {
@@ -15,3 +20,9 @@ const onErrorLoad = () => {
 };
 
 getData(createMarkers, onErrorLoad);
+
+const mapForm = document.querySelector('.map__filters');
+
+mapForm.addEventListener('change', () => {
+  rerenderMarkers(ads);
+});
