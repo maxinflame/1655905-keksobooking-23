@@ -1,28 +1,22 @@
-import {createAdMarker} from './map.js';
-import './form.js';
-import './map.js';
+import {initMap} from './map.js';
+import {initForm} from './form.js';
 import {getData} from './api.js';
-import {showAlert} from './util.js';
-import {rerenderMarkers} from './filter.js';
-import {MAX_AD_MARKERS} from './constants.js';
+import {activatePage, deactivatePage, showAlert} from './util.js';
+import {initFilter} from './filter.js';
 
-let ads;
-
-const createMarkers = (data) => {
-  ads = data;
-  ads
-    .slice(0, MAX_AD_MARKERS)
-    .forEach(createAdMarker);
+const onSuccessLoad = (items) => {
+  initFilter(items);
 };
 
 const onErrorLoad = () => {
   showAlert('Не удалось загрузить данные с сервера');
 };
 
-getData(createMarkers, onErrorLoad);
+const onMapLoaded = () => {
+  activatePage();
+  getData(onSuccessLoad, onErrorLoad);
+  initForm();
+};
 
-const mapForm = document.querySelector('.map__filters');
-
-mapForm.addEventListener('change', () => {
-  rerenderMarkers(ads);
-});
+deactivatePage();
+initMap(onMapLoaded);
