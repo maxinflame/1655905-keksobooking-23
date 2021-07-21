@@ -7,8 +7,10 @@ const OFFER_TYPES = {
 };
 
 const CenterCoordinates = {
-  lat: 	35.6895,
-  lng: 139.692,
+  LAT: 	35.6895,
+  LNG: 139.692,
 };
 
-export{OFFER_TYPES, CenterCoordinates};
+const MAX_AD_MARKERS = 10;
+
+export{OFFER_TYPES, CenterCoordinates, MAX_AD_MARKERS};

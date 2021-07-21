@@ -1,4 +1,3 @@
-import {activatePage, deactivatePage} from './util.js';
 import {createPopup} from './cards.js';
 import {CenterCoordinates} from './constants.js';
 import {updateAddress} from './form.js';
@@ -10,37 +9,38 @@ const PinIconUrl= {
   regularPin: '../img/pin.svg',
 };
 
-deactivatePage();
+let mainPinMarker = null;
+let defaultMainPinCoordinates = null;
+let map = null;
+const markers = [];
 
-const map = L.map('map-canvas')
-  .on('load', () => {
-    activatePage();
-  })
-  .setView ({
-    lat: 	CenterCoordinates.lat,
-    lng: CenterCoordinates.lng,
-  }, 12);
-
-L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+const createMarker = (lat, lng, icon, isDraggable) => L.marker(
   {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    lat: lat,
+    lng: lng,
   },
-).addTo(map);
+  {
+    icon: icon,
+    draggable: isDraggable,
+  },
+);
 
-const createMarker = (lat, lng, icon, isDraggable) => {
-  const marker = L.marker(
+const createMap = (onMapLoaded) => {
+  map = L.map('map-canvas')
+    .on('load', () => {
+      onMapLoaded();
+    })
+    .setView ({
+      lat: 	CenterCoordinates.LAT,
+      lng: CenterCoordinates.LNG,
+    }, 12);
+
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     {
-      lat: lat,
-      lng: lng,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     },
-    {
-      icon: icon,
-      draggable: isDraggable,
-    },
-  );
-  marker.addTo(map);
-  return marker;
+  ).addTo(map);
 };
 
 const createPinIcon = (iconUrl, iconSize) => {
@@ -52,22 +52,53 @@ const createPinIcon = (iconUrl, iconSize) => {
   return icon;
 };
 
-const mainPinMarker = createMarker(CenterCoordinates.lat, CenterCoordinates.lng, createPinIcon(PinIconUrl.mainIcon, MAIN_PIN_ICON_SIZE), true);
+const initMainPin = () => {
+  mainPinMarker = createMarker(CenterCoordinates.LAT, CenterCoordinates.LNG, createPinIcon(PinIconUrl.mainIcon, MAIN_PIN_ICON_SIZE), true);
+  defaultMainPinCoordinates = mainPinMarker.getLatLng();
+  updateAddress(defaultMainPinCoordinates);
 
-updateAddress(CenterCoordinates);
-mainPinMarker.on('moveend', (evt) => {
-  const mainPinCoordinates = evt.target.getLatLng();
-  updateAddress(mainPinCoordinates);
-});
+  mainPinMarker.on('move', (evt) => {
+    const mainPinCoordinates = evt.target.getLatLng();
+    updateAddress(mainPinCoordinates);
+  });
+  mainPinMarker.addTo(map);
+};
 
-const createAdMarker = (ad) => {
-  const marker = createMarker(ad.location.lat, ad.location.lng, createPinIcon(PinIconUrl.regularPin, PIN_ICON_SIZE), false);
-  marker.bindPopup(createPopup(ad));
+const getMarker = (ad) => {
+  const {
+    location: { lat, lng },
+  } = ad;
+  return createMarker(lat, lng, createPinIcon(PinIconUrl.regularPin, PIN_ICON_SIZE), false);
+};
+
+const renderMarkers = (ads) => {
+  ads.forEach((ad) => {
+    const marker = getMarker(ad);
+    marker.bindPopup(createPopup(ad));
+    marker.addTo(map);
+    markers.push(marker);
+  });
+};
+
+const deleteMarkers = () => {
+  markers.forEach((item) => {
+    item.remove();
+  });
+};
+
+const updateMarkers = (ads) => {
+  deleteMarkers();
+  renderMarkers(ads);
 };
 
 const resetMainPin = ()=> {
-  const newLatLng = new L.LatLng(CenterCoordinates.lat, CenterCoordinates.lng);
-  mainPinMarker.setLatLng(newLatLng);
+  mainPinMarker.setLatLng(defaultMainPinCoordinates);
+  updateAddress(defaultMainPinCoordinates);
 };
 
-export {createAdMarker, resetMainPin};
+const initMap = (onMapLoaded) => {
+  createMap(onMapLoaded);
+  initMainPin();
+};
+
+export {initMap, resetMainPin, updateMarkers};

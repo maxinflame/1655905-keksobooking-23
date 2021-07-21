@@ -1,13 +1,6 @@
 import {sendData} from './api.js';
-import { CenterCoordinates } from './constants.js';
 import {resetMainPin} from './map.js';
 import {showMessage} from './util.js';
-
-const adForm = document.querySelector('.ad-form');
-const roomsSelect = document.querySelector('#room_number');
-const guestsSelect = document.querySelector('#capacity');
-const guestsOptions = guestsSelect.querySelectorAll('option');
-const inputAddress = document.querySelector('#address');
 
 const ROOMS = {
   ONE: 1,
@@ -30,6 +23,13 @@ const AVAILABLE_GUESTS = {
   [ROOMS.HUNDRED]: [GUESTS.ZERO],
 };
 
+const adForm = document.querySelector('.ad-form');
+const roomsSelect = document.querySelector('#room_number');
+const guestsSelect = document.querySelector('#capacity');
+const guestsOptions = guestsSelect.querySelectorAll('option');
+const inputAddress = document.querySelector('#address');
+const resetButton = document.querySelector('.ad-form__reset');
+
 const disableGuestsOptions = (validGuests) => {
   guestsOptions.forEach((item) => {
     item.disabled = !validGuests.includes(Number(item.value));
@@ -43,10 +43,6 @@ const validateGuests = () => {
   guestsSelect.value = defaultGuestValue;
 };
 
-
-validateGuests();
-roomsSelect.addEventListener('change', validateGuests);
-
 const updateAddress = (coordinates) => {
   inputAddress.value = `${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}`;
 };
@@ -54,7 +50,6 @@ const updateAddress = (coordinates) => {
 const resetForm = () => {
   adForm.reset();
   resetMainPin();
-  updateAddress(CenterCoordinates);
   validateGuests();
 };
 
@@ -64,21 +59,30 @@ const onSuccessSendForm = () => {
 };
 
 const onErrorSendForm = () => {
-  showMessage('');
+  showMessage('error');
 };
 
-adForm.addEventListener('submit', (evt) => {
+const onFormSubmit = (evt) => {
   evt.preventDefault();
 
   const formData = new FormData(evt.target);
   sendData(formData, onSuccessSendForm, onErrorSendForm);
-});
+};
 
-
-const resetButton = document.querySelector('.ad-form__reset');
-resetButton.addEventListener('click', (evt) => {
+const onResetButtonClick = (evt) => {
   evt.preventDefault();
   resetForm();
-});
+};
 
-export {updateAddress};
+const initEvenentListeners = () => {
+  adForm.addEventListener('submit', onFormSubmit);
+  resetButton.addEventListener('click', onResetButtonClick);
+  roomsSelect.addEventListener('change', validateGuests);
+};
+
+const initForm = () => {
+  validateGuests();
+  initEvenentListeners();
+};
+
+export {initForm, updateAddress};
