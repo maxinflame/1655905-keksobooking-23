@@ -1,4 +1,5 @@
-import {OFFER_TYPES} from './constants.js';
+import {TypeNames, TypeTexts} from './constants.js';
+import { getKeyByValue } from './util.js';
 
 const cardTemplate = document.querySelector('#card')
   .content
@@ -88,13 +89,15 @@ const createPopup = function (item) {
     },
   } = item;
 
+  const typeName = getKeyByValue(TypeNames, type);
+
   cardElement.querySelector('.popup__title').textContent = title;
 
   cardElement.querySelector('.popup__text--address').textContent = address;
 
   cardElement.querySelector('.popup__text--price').textContent = getDisplayText(price, 'Цена не указана', `${price}₽/ночь`);
 
-  cardElement.querySelector('.popup__type').textContent = getDisplayText(type, 'Тип жилья не указан', OFFER_TYPES[type]);
+  cardElement.querySelector('.popup__type').textContent = getDisplayText(type, 'Тип жилья не указан', TypeTexts[typeName]);
 
   cardElement.querySelector('.popup__text--capacity').textContent = getGuestsText(guests, rooms);
 
