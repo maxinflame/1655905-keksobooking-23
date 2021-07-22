@@ -74,7 +74,7 @@ const activatePage = () => {
   mapFieldset.disabled = false;
 };
 
-function debounce (callback, timeoutDelay = 500) {
+function debounce (callback, timeoutDelay) {
   let timeoutId;
 
   return (...rest) => {
@@ -83,4 +83,10 @@ function debounce (callback, timeoutDelay = 500) {
   };
 }
 
-export {showAlert, showMessage, deactivatePage, activatePage, debounce};
+const getKeyByValue = (object, value) => {
+  const key = Object.keys(object).find((name) => object[name] === value);
+  return key;
+};
+
+
+export {showAlert, showMessage, deactivatePage, activatePage, debounce, getKeyByValue};

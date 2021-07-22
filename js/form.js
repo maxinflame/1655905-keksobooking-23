@@ -1,34 +1,47 @@
 import {sendData} from './api.js';
 import {resetMainPin} from './map.js';
-import {showMessage} from './util.js';
+import {getKeyByValue, showMessage} from './util.js';
+import {TypeNames} from './constants.js';
 
-const ROOMS = {
+const Rooms = {
   ONE: 1,
   TWO: 2,
   THREE: 3,
   HUNDRED: 100,
 };
 
-const GUESTS = {
+const Guests = {
   ZERO: 0,
   ONE: 1,
   TWO: 2,
   THREE: 3,
 };
 
-const AVAILABLE_GUESTS = {
-  [ROOMS.ONE]: [GUESTS.ONE],
-  [ROOMS.TWO]: [GUESTS.ONE,  GUESTS.TWO],
-  [ROOMS.THREE]: [GUESTS.ONE,  GUESTS.TWO, GUESTS.THREE],
-  [ROOMS.HUNDRED]: [GUESTS.ZERO],
+const AvailableGuests = {
+  [Rooms.ONE]: [Guests.ONE],
+  [Rooms.TWO]: [Guests.ONE,  Guests.TWO],
+  [Rooms.THREE]: [Guests.ONE,  Guests.TWO, Guests.THREE],
+  [Rooms.HUNDRED]: [Guests.ZERO],
+};
+
+const MinPrices = {
+  BUNGALOW: 0,
+  FLAT: 1000,
+  HOTEL: 3000,
+  HOUSE: 5000,
+  PALACE: 10000,
 };
 
 const adForm = document.querySelector('.ad-form');
-const roomsSelect = document.querySelector('#room_number');
-const guestsSelect = document.querySelector('#capacity');
+const roomsSelect = adForm.querySelector('#room_number');
+const guestsSelect = adForm.querySelector('#capacity');
 const guestsOptions = guestsSelect.querySelectorAll('option');
-const inputAddress = document.querySelector('#address');
-const resetButton = document.querySelector('.ad-form__reset');
+const inputAddress = adForm.querySelector('#address');
+const resetButton = adForm.querySelector('.ad-form__reset');
+const typeSelect = adForm.querySelector('#type');
+const inputPrice = adForm.querySelector('#price');
+const timeIn = adForm.querySelector('#timein');
+const timeOut = adForm.querySelector('#timeout');
 
 const disableGuestsOptions = (validGuests) => {
   guestsOptions.forEach((item) => {
@@ -37,7 +50,7 @@ const disableGuestsOptions = (validGuests) => {
 };
 
 const validateGuests = () => {
-  const validGuests = AVAILABLE_GUESTS[roomsSelect.value];
+  const validGuests = AvailableGuests[roomsSelect.value];
   const [defaultGuestValue] = validGuests;
   disableGuestsOptions(validGuests);
   guestsSelect.value = defaultGuestValue;
@@ -74,14 +87,33 @@ const onResetButtonClick = (evt) => {
   resetForm();
 };
 
+const validatePrice = () => {
+  const type = getKeyByValue(TypeNames, typeSelect.value);
+  inputPrice.placeholder = MinPrices[type];
+  inputPrice.min = MinPrices[type];
+};
+
+const timeInSync = () => {
+  timeOut.value = timeIn.value;
+};
+
+const timeOutSync = () => {
+  timeIn.value = timeOut.value;
+};
+
 const initEvenentListeners = () => {
   adForm.addEventListener('submit', onFormSubmit);
   resetButton.addEventListener('click', onResetButtonClick);
   roomsSelect.addEventListener('change', validateGuests);
+  typeSelect.addEventListener('change', validatePrice);
+  timeIn.addEventListener('change', timeInSync);
+  timeOut.addEventListener('change', timeOutSync);
 };
 
 const initForm = () => {
   validateGuests();
+  validatePrice();
+  timeInSync();
   initEvenentListeners();
 };
 
